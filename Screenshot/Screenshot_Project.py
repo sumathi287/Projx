@@ -4,9 +4,8 @@ import os
 import pyautogui
 import sys
 import time
-
-
 def stop_function():
+        '''show prompt message box'''
         ctypes.windll.user32.MessageBoxW(0, "Projects folder is not exist in current folder path", "Info", 0x00)
         sys.exit()
 def stop_function_1():
