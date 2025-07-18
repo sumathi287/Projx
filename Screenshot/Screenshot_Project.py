@@ -4,10 +4,10 @@ import os
 import pyautogui
 import sys
 import time
-
-
 def stop_function():
         ctypes.windll.user32.MessageBoxW(0, "Projects folder is not exist in current folder path\nplease can you create the folder path like\n"r"C:\Users\Username\Documents\Screenshot_Image_Path", "Info", 0x00)
+        '''show prompt message box'''
+        ctypes.windll.user32.MessageBoxW(0, "Projects folder is not exist in current folder path", "Info", 0x00)
         sys.exit()
 def stop_function_1():
         ctypes.windll.user32.MessageBoxW(0, "day.txt file is not exist in \"Screenshot_Image_Path\" folder path", "Info", 0x00)
