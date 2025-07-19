@@ -3,70 +3,56 @@ from datetime import date,timedelta
 import os
 import pyautogui
 import sys
+from datetime import datetime
 import time
+
 def stop_function():
         ctypes.windll.user32.MessageBoxW(0, "Projects folder is not exist in current folder path\nplease can you create the folder path like\n"r"C:\Users\Username\Documents\Screenshot_Image_Path", "Info", 0x00)
-        '''show prompt message box'''
         ctypes.windll.user32.MessageBoxW(0, "Projects folder is not exist in current folder path", "Info", 0x00)
         sys.exit()
 def stop_function_1():
         ctypes.windll.user32.MessageBoxW(0, "day.txt file is not exist in \"Screenshot_Image_Path\" folder path", "Info", 0x00)
-        sys.exit()
+        sys.exit()    
+def date_calculation(image_dir,image_name,user_var):
+        current_date = datetime.now()
+        timestamp_from_saved_path = os.path.getctime(image_dir)
+        date_from_saved_path = datetime.fromtimestamp(timestamp_from_saved_path)
+        age_of_image = (current_date-date_from_saved_path).days
+        if age_of_image >= user_var:
+                response =  ctypes.windll.user32.MessageBoxW(0,"the age of {image_name} is {age_of_image}\nPress 'yes' if you want to delete it\nPress 'No' you want continue the screenshot process without deleting image","Info",0x04)
+                if response == 6:
+                        os.remove(image_dir)
+                        ctypes.windll.user32.MessageBoxW(0,f"the {image_name} is succesfully removed" , "Info", 0x00)
 
-try:
-
-        files = os.listdir(os.path.join(os.path.expanduser("~"),"Documents","Screenshot_Image_Path"))
-except FileNotFoundError:
-        stop_function()
-
-count = 0
-
-date =  date.today()
-
-days_to_add = timedelta(days=15)
-
-future_date = date + days_to_add 
-
-
-date = str(date)
-
-file = "day.txt"
-
-try:
-        path = os.path.join(os.path.expanduser("~"),"Documents","Screenshot_Image_Path")
-except FileNotFoundError:
-        stop_function()
+if getattr(sys,'frozon',False):
+        file_dir = os.path.dirname(sys.executable)
+else:
+        file_dir = os.path.dirname(os.path.abspath(__file__))
         
-file_path = os.path.join(path,file)
+folder_list = os.listdir(file_dir)
+
+user_var = input("Enter the minimum age (in days) of images you want to delete:\n")
+user_var = int(user_var)
+
+for i in folder_list: #logic to increae the value of 'count' variable if the image is preent in current folder
+        if i.endswith('jpg'):
+                image_path_var =  os.path.join(file_dir,i)
+                date_calculation(image_path_var,i,user_var)
+time.sleep(1)
+
+screenshot = pyautogui.screenshot()
+
+screenshot.show()
 
 
-try:
+time_stamp = datetime.now()
 
-        f = open(file_path ,"r")
+formating_str = time_stamp.strftime("%d-%m-%Y-%H-%M-%S")
 
-        ver = f.read()
+file_saved_path = os.path.join( file_dir,f"image_{formating_str}.jpg")
 
-        f.close()
 
-except FileNotFoundError:
-        stop_function_1()
+file_saved_path = os.path.join( file_dir,f"image_{formating_str}.jpg")
 
-if ver == date:
-    f = open(file_path ,"w")
-    f.write(f"{future_date}")
-    f.close()
-    for i in files:
-        if i.endswith((".jpeg",".jpg")):
-            os.remove(os.path.join(path,i))
 
-files = os.listdir(os.path.join(os.path.expanduser("~"),"Documents","Screenshot_Image_Path"))
-print(type(files))
-for i in files:
-    if i.endswith((".jpeg",".jpg")):
-        count += 1
-
-screenshot = pyautogui.screenshot() #take screenshot
-
-screenshot.show() #to view the screenshot image on the screen
-
-screenshot.save(os.path.join(os.path.expanduser("~"),"Documents","Screenshot_Image_Path",f"image_{count}.jpg")) #save the image in current path location
+screenshot.save(file_saved_path)

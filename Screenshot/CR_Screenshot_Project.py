@@ -6,7 +6,7 @@ import pyautogui
 import sys
 import time ## unsued module is present here
 ##! Please change the default tab size to 4 spaces - right now it is 8 spaces
-def stop_function(): ##provide space here to improve readbility
+def stop_function():
         '''show prompt message box''' ##docstring is not enough here: ## ALSO please download the extension: autoDocstring, it is very
         ctypes.windll.user32.MessageBoxW(0, "Projects folder is not exist in current folder path", "Info", 0x00)
         sys.exit()
@@ -14,7 +14,7 @@ def stop_function_1():
         ctypes.windll.user32.MessageBoxW(0, "day_1.txt file is not exist in current folder path", "Info", 0x00)
         sys.exit()
 
-try: ## need not leave space after try
+try:
 
         files = os.listdir(os.path.join(os.path.expanduser("~"),"Documents","Projects"))
 except FileNotFoundError: ## what about other possible exceptions
