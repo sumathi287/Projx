@@ -15,14 +15,23 @@ if getattr(sys,'frozon',False):
 else:
         file_dir = os.path.dirname(os.path.abspath(__file__))
 
-config = configparser.ConfigParser()
+log_file_path = os.path.join(file_dir,"screenshot_log.log")
 
+logging.basicConfig(filename=log_file_path,level=logging.DEBUG,format="%(asctime)s - %(levelname)s - %(message)s")
+
+#log_file_path = os.path.join(file_dir,"screenshot_log.log")
+
+config = configparser.ConfigParser()
 
 file_read_path = os.path.join(file_dir,"config.ini")
 
-file_read = config.read(os.path.join(file_dir,"config.ini"))
+if not os.path.isfile(file_read_path):
+    logging.error("Missing config.ini file. Application cannot continue.")
+    sys.exit(1)
 
 
+file_read = config.read(file_read_path)
+                      
 level_str_age_of_image = config.get("logging","age_of_image",fallback="-1")
 
 level_str_age_of_image = int(level_str_age_of_image)
@@ -35,13 +44,12 @@ level_str_image_extension_type = config.get("logging","image_extension_type",fal
 
 level_str_image_type_to_delete= config.get("logging","image_type_to_delete",fallback=".jpg").lower()
 
-# def stop_function():
-#         ctypes.windll.user32.MessageBoxW(0, "Projects folder is not exist in current folder path\nplease can you create the folder path like\n"r"C:\Users\Username\Documents\Screenshot_Image_Path", "Info", 0x00)
-#         ctypes.windll.user32.MessageBoxW(0, "Projects folder is not exist in current folder path", "Info", 0x00)
-#         sys.exit()
-# def stop_function_1():
-#         ctypes.windll.user32.MessageBoxW(0, "day.txt file is not exist in \"Screenshot_Image_Path\" folder path", "Info", 0x00)
-#         sys.exit()    
+log_level_str = config.get("logging","level",fallback= "DEBUG").upper()
+
+log_level = getattr(logging,log_level_str,logging.DEBUG)
+
+logging.basicConfig(filename=log_file_path,level=log_level,format="%(asctime)s - %(levelname)s - %(message)s")
+
 def date_calculation(image_dir,image_name):
         current_date = datetime.now()
         timestamp_from_saved_path = os.path.getctime(image_dir)
@@ -51,8 +59,11 @@ def date_calculation(image_dir,image_name):
                 #response =  ctypes.windll.user32.MessageBoxW(0,"the age of {image_name} is {age_of_image}\nPress 'yes' if you want to delete it\nPress 'No' you want continue the screenshot process without deleting image","Info",0x04)
                 if level_str_Delete_of_images == 'YES':
                         os.remove(image_dir)
+                        logging.info(f"successfully deleted image:{image_name}")
                         #ctypes.windll.user32.MessageBoxW(0,f"the {image_name} is succesfully removed" , "Info", 0x00)
         
+logging.info("Program start.....")
+
 folder_list = os.listdir(file_dir)
 
 for i in folder_list: #logic to increae the value of 'count' variable if the image is preent in current folder
@@ -63,6 +74,8 @@ time.sleep(1)
 
 screenshot = pyautogui.screenshot()
 
+logging.info("screenshot was successfully taken")
+
 screenshot.show()
 
 time_stamp = datetime.now()
@@ -71,4 +84,7 @@ formating_str = time_stamp.strftime("%d-%m-%Y-%H-%M-%S")
 
 file_saved_path = os.path.join( file_dir,f"image_{formating_str}{level_str_image_extension_type}")
 
+logging.info(f"the saved image :image_{formating_str}{level_str_image_extension_type}")
 screenshot.save(file_saved_path)
+logging.info(f"screenshot was successfully saved in the {file_dir} path ")
+logging.info(f"Program end....")
