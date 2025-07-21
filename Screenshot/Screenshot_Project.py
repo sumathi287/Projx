@@ -7,10 +7,11 @@ from datetime import datetime
 import time
 import logging
 import configparser
+import pytz
 
+india_timezone = pytz.timezone("Asia/Kolkata")
 
-
-if getattr(sys,'frozon',False):
+if getattr(sys,'frozen',False):
         file_dir = os.path.dirname(sys.executable)
 else:
         file_dir = os.path.dirname(os.path.abspath(__file__))
@@ -20,6 +21,8 @@ log_file_path = os.path.join(file_dir,"screenshot_log.log")
 logging.basicConfig(filename=log_file_path,level=logging.DEBUG,format="%(asctime)s - %(levelname)s - %(message)s")
 
 #log_file_path = os.path.join(file_dir,"screenshot_log.log")
+
+logging.info("Program start.....")
 
 config = configparser.ConfigParser()
 
@@ -48,12 +51,13 @@ log_level_str = config.get("logging","level",fallback= "DEBUG").upper()
 
 log_level = getattr(logging,log_level_str,logging.DEBUG)
 
-logging.basicConfig(filename=log_file_path,level=log_level,format="%(asctime)s - %(levelname)s - %(message)s")
+#logging.basicConfig(filename=log_file_path,level=log_level,format="%(asctime)s - %(levelname)s - %(message)s")
 
 def date_calculation(image_dir,image_name):
-        current_date = datetime.now()
+        current_date = datetime.now(india_timezone)
         timestamp_from_saved_path = os.path.getctime(image_dir)
         date_from_saved_path = datetime.fromtimestamp(timestamp_from_saved_path)
+        date_from_saved_path = india_timezone.localize(date_from_saved_path)
         age_of_image_calculated = (current_date-date_from_saved_path).days
         if age_of_image_calculated == level_str_age_of_image:
                 #response =  ctypes.windll.user32.MessageBoxW(0,"the age of {image_name} is {age_of_image}\nPress 'yes' if you want to delete it\nPress 'No' you want continue the screenshot process without deleting image","Info",0x04)
@@ -62,7 +66,7 @@ def date_calculation(image_dir,image_name):
                         logging.info(f"successfully deleted image:{image_name}")
                         #ctypes.windll.user32.MessageBoxW(0,f"the {image_name} is succesfully removed" , "Info", 0x00)
         
-logging.info("Program start.....")
+
 
 folder_list = os.listdir(file_dir)
 
@@ -70,7 +74,7 @@ for i in folder_list: #logic to increae the value of 'count' variable if the ima
         if i.endswith(level_str_image_type_to_delete):
                 image_path_var =  os.path.join(file_dir,i)
                 date_calculation(image_path_var,i)
-time.sleep(1)
+#time.sleep(1)
 
 screenshot = pyautogui.screenshot()
 
@@ -78,9 +82,11 @@ logging.info("screenshot was successfully taken")
 
 screenshot.show()
 
-time_stamp = datetime.now()
 
-formating_str = time_stamp.strftime("%d-%m-%Y-%H-%M-%S")
+
+time_stamp = datetime.now(india_timezone)
+
+formating_str = time_stamp.strftime("%d-%m-%Y-%H_%M_%S")
 
 file_saved_path = os.path.join( file_dir,f"image_{formating_str}{level_str_image_extension_type}")
 
