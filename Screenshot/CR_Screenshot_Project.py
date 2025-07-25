@@ -1,92 +1,145 @@
-# once the given changes are made, this CR[Code Review] file must be deleted from the repo
+##!CR: SUMMARY
+# - amazing job done from the previous version,
+# - the application now looks more professional and handles more test cases now
+##!CR: required improvements:
+##!CR:  USE Logger object instead of using it statically: read : https://stackoverflow.com/a/15735146
+##!CR:  test case: display windows error message if .ini file is missing
+##!CR:  import only the required methods/object from the modules
+
+# - only 3 "improvements" required to make you code professional -
+# the existing code is very functional - and of the intermediate industry standard!
+# WELL DONE!!!
+
+
 import ctypes
-from datetime import date,timedelta
-import os ## not all the methods or classes in this module are used, hence import only the necessary ones
+from datetime import date, timedelta
+import os  ##!CR: note that very few methods/objects are used, import only the required ones.
+
+##!CR: for e.g.: if you are importing "dirname" from os.path
+##!CR: then say: from os.path import dirname
+##!CR: you can also give an alias like:
+##!CR: from os.path import dirname as os_path_dirname
 import pyautogui
 import sys
-import time ## unsued module is present here
-##! Please change the default tab size to 4 spaces - right now it is 8 spaces
-def stop_function():
-        '''show prompt message box''' ##docstring is not enough here: ## ALSO please download the extension: autoDocstring, it is very
-        ctypes.windll.user32.MessageBoxW(0, "Projects folder is not exist in current folder path", "Info", 0x00)
-        sys.exit()
-def stop_function_1():
-        ctypes.windll.user32.MessageBoxW(0, "day_1.txt file is not exist in current folder path", "Info", 0x00)
-        sys.exit()
+from datetime import datetime
 
-try:
+# import time
+import logging  ##!CR: Configure the logger such that data is logged in the log and also console screen
 
-        files = os.listdir(os.path.join(os.path.expanduser("~"),"Documents","Projects"))
-except FileNotFoundError: ## what about other possible exceptions
-        stop_function()
+##!CR: NOTE: create an object of the logging instead of using it with class [avoid static usage]
+import configparser
+import pytz
 
-count = 0
+india_timezone = pytz.timezone(
+    "Asia/Kolkata"
+)  # convert to a specific timezone("Asia/Kolkata")
+if getattr(
+    sys, "frozen", False
+):  # execute if block if we run the scrippt by operating system directly (Windows) (note:without using any source code or IDE's)
+    file_dir = os.path.dirname(sys.executable)
+else:  # executing else block if we run the script using IDEs
+    file_dir = os.path.dirname(os.path.abspath(__file__))
+log_file_path = os.path.join(file_dir, "screenshot_log.log")
+# set up logging with specific configuration
+logging.basicConfig(
+    filename=log_file_path,
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+logging.info("Program start.....")
+config = configparser.ConfigParser()
+file_read_path = os.path.join(file_dir, "config.ini")
+if not os.path.isfile(
+    file_read_path
+):  # check if the "config.ini" file path is existing or not in script location
+    logging.error("Missing config.ini file. Application cannot continue.")
+    ##!CR: for missing ini file, please also raise a windows error message box
+    sys.exit(1)
+file_read = config.read(
+    file_read_path
+)  # file_read_path -> is path of "config.ini" file
+##!CR: please check if the ini file contains the required options:
+##!CR: i.e. what happens if age_of_image is not given in the .ini file
+level_str_age_of_image = config.get("logging", "age_of_image", fallback="-1")
 
-date =  date.today()
+level_str_age_of_image = int(level_str_age_of_image)
 
-days_to_add = timedelta(days=15)
+level_str_Delete_of_images = config.get(
+    "logging", "Delete_of_images", fallback="NO"
+).upper()
 
-future_date = date + days_to_add
+level_str_image_extension_type = config.get(
+    "logging", "image_extension_type", fallback=".jpg"
+).lower()
 
+level_str_image_type_to_delete = config.get(
+    "logging", "image_type_to_delete", fallback=".jpg"
+).lower()
+log_level_str = config.get("logging", "level", fallback="DEBUG").upper()
+# get the value of an attribute of an object by name (as a string).
 
-date = str(date)
+##!CR: HERE: since we are using it statically, we are modifying it again using the basicConfig
+##!CR: if the logger is used with object, then it is easy to modify level
 
-file = "day_1.txt"
-
-try:
-        path = os.path.join(os.path.expanduser("~"),"Documents","Projects") ##NOTE: These strings here can be replaced with global variables
-except FileNotFoundError:
-        stop_function()
-
-file_path = os.path.join(path,file)
-
-
-try:
-
-    f = open(file_path ,"r") ## kindly use 'with' block here isntead of using 'open' and 'close' functions
-
-    ver = f.read()
-
-    f.close()
-
-except FileNotFoundError:
-        stop_function_1()
-
-if ver == date:
-    f = open(file_path ,"w") ## kindly use 'with' block here isntead of using 'open' and 'close' functions
-    f.write(f"{future_date}")
-    f.close()
-    for i in files:
-        if i.endswith((".jpeg",".jpg")): ##!this is amazing ! nice use of tuples to work with the method 'endswidth' SUPERBB!!!
-            os.remove(os.path.join(path,i)) ##DO NOT Chain more than 2 function calls - it is not easy to read if you do this.
-
-files = os.listdir(os.path.join(os.path.expanduser("~"),"Documents","Projects"))
-print(type(files)) ## Also include info about what you are printing
-for i in files:
-    if i.endswith((".jpeg",".jpg")): ## NOTE: This tuple is reused many times - better use a global variable instead
-        count += 1
-
-screenshot = pyautogui.screenshot() #take screenshot
-##NOTE: These comments here: "#take screenshot"  is not required because the method used is already clear and the user can understand what is happening here
-screenshot.show() #to view the screenshot image on the screen
-
-#screenshot.save(os.path.join(os.path.expanduser("~"),"Documents","Projects",f"image_{count}.jpg")) #save the image in current path location
-
-##NOTE: instead of chainging so much methods - seperate them into different lines# FOR E.G.:
-screenshot_file_name = f"image_{count}.jpg"
-screenshot_file_path = os.path.join(os.path.expanduser("~"),"Documents","Projects",)
-screenshot.save(screenshot_file_path)
+log_level = getattr(logging, log_level_str, logging.DEBUG)
+# set up logging with specific configuration
+logging.basicConfig(
+    filename=log_file_path,
+    level=log_level,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 
 
+def date_calculation(image_dir, image_name):
+    """
+       Calculate the number of days between two date objects
+       Delete the image object (specfic extention:selected by user)if the calculated days is match with user input
+    Args:
+        image_dir(str): here i use the absolute path to access the folder path for image to deleting process
+        image_name(str):(.JPEG, .PNG, .GIF, .TIFF, .WebP, .SVG, .BMP, and .HEIF)
 
-#SOME CORNER CASES AND ADDITIONAL TEST CASE THAT WOULD BE NICE TO COVER:
-#--------------------------------------------------------------------------------
-# 1. don't use "day.txt": read screenshot save date and computer's current date and take the decision to delete older images
-# 2. Provide option to user to skip delete option - may be command terminal or using windows message box
-# 3. have a config file to
-#   => what format to save the image in?
-#   => where to read and save the screenshots - right now we have hardcoded - it is best to mention in the config file
-#   => how old can the screenshots be? user can alter this data to control the age of screenshot : 15days/30 days/100 days/ etc.,.
-# YOU CAN READ ABOUT config files (or) .ini files
-# 4. [ADVANCED] Log all the steps that the application takes - this creates a solid bug report and consoler logs -
-#   the developer or the user can take a look at this log and understand what went wrong
+    Returns:
+        None
+    """
+    current_date = datetime.now(india_timezone)
+    timestamp_from_saved_path = os.path.getctime(
+        image_dir
+    )  # to get Raw timestamp (timestamp (a float) - the number of seconds since the Unix epoch (Jan 1, 1970).)
+    date_from_saved_path = datetime.fromtimestamp(
+        timestamp_from_saved_path
+    )  # convert Raw timestamp to readable timestamp
+    date_from_saved_path = india_timezone.localize(
+        date_from_saved_path
+    )  # convert to India Standard Time (IST)
+    age_of_image_calculated = (
+        current_date - date_from_saved_path
+    ).days  # number of days between two date objects (date of object_image and current date)
+    if age_of_image_calculated == level_str_age_of_image:
+        if level_str_Delete_of_images == "YES":
+            os.remove(image_dir)
+            logging.info(
+                f"successfully deleted image:{image_name}"
+            )  # logging message about to represent deleted image name
+
+
+folder_list = os.listdir(file_dir)
+
+# logic to identify the extention type of objects(images) from the script location and call the function with passing arg:send the object location ,object name to deleting process
+for i in folder_list:
+    if i.endswith(level_str_image_type_to_delete):
+        image_path_var = os.path.join(file_dir, i)
+        date_calculation(image_path_var, i)
+screenshot = pyautogui.screenshot()
+logging.info("screenshot was successfully taken")
+screenshot.show()
+time_stamp = datetime.now(india_timezone)
+formating_str = time_stamp.strftime("%d-%m-%Y-%H_%M_%S")
+file_saved_path = os.path.join(
+    file_dir, f"image_{formating_str}{level_str_image_extension_type}"
+)  ##!CR: GREAT JOB HERE, using the f string
+logging.info(
+    f"the saved image name :image_{formating_str}{level_str_image_extension_type}"
+)
+screenshot.save(file_saved_path)
+logging.info(f"screenshot was successfully saved in the {file_dir} path ")
+logging.info(f"Program end....")
