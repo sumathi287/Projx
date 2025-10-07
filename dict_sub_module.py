@@ -13,7 +13,6 @@ key = " "
 
 logging.basicConfig(
     filename=log_path,
-    # filemode="a",
     level=logging.DEBUG,
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
@@ -50,7 +49,6 @@ def save_dict(dict_data):
     pickle_dict_data = pickle.dumps(original_dict_data)
     key = gen_enc_key()
     encrypt_pickled_data = key.encrypt(pickle_dict_data)
-    # print(type(encrypt_pickled_data))
     text_path = os.path.join(text_path, "output.bin")
     with open(text_path, "wb") as f:
         f.write(encrypt_pickled_data)
@@ -82,10 +80,8 @@ def read_data():
                 "The .bin file was read successfully, and encrypted data retrieved."
             )
             decrypt_message = key.decrypt(read_encrypted_data)
-            # decrypt_message = decrypt_message.decode()
             unpickled_decrypt_message = pickle.loads(decrypt_message)
             print("The received dict message is", unpickled_decrypt_message)
-            # print(unpickled_decrypt_message)
             logging.info("The decrypted data was successfully unpickled")
         else:
             logging.info(
@@ -97,7 +93,6 @@ def read_data():
         logging.info("The message was received successfully!!")
     else:
         print("The data is not dict type plese check the log for more info")
-        # logging.info("The dict data is received successfully")
 
 
 def gen_enc_key():
