@@ -20,6 +20,15 @@ logging.basicConfig(
 
 
 def stop():
+    """
+    Stops the program immediately and logs an error message.
+
+    This function logs an error indicating that the program was forcefully
+    stopped, and then terminates the program using sys.exit().
+
+    Raises:
+        SystemExit: Exits the program immediately.
+    """
     logging.error("The program was stopped forcefully!!.")
     sys.exit()
 
@@ -49,6 +58,13 @@ def save_dict(dict_data):
 
 
 def read_data():
+    """Decrypt,Deserialize (unpickle), and save a decrypted dict data in variable and print in console screen.
+    Args:
+        None
+    Returns:
+        True(log info):The message was received successfully!!
+        False(log info):The data is not dict type plese check the log for more info!!
+    """
     global encrypt_pickled_data
     global text_path
     global key
@@ -85,6 +101,15 @@ def read_data():
 
 
 def gen_enc_key():
+    """
+    Generate a new Fernet encryption key and return a Fernet object.
+
+    This function creates a random symmetric key using Fernet, which can
+    be used for encrypting and decrypting data.
+
+    Returns:
+        Fernet: A Fernet object initialized with the generated key.
+    """
     key = Fernet.generate_key()
     fernet_key = Fernet(key)
     return fernet_key
