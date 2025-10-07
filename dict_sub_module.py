@@ -6,8 +6,8 @@ import logging
 import sys
 
 file_path = os.path.join(os.path.join(__file__))
-text_path = os.path.dirname(file_path)
-log_path = os.path.join(text_path, "logg_file.log")
+external_file_path = os.path.dirname(file_path)
+log_path = os.path.join(external_file_path, "logg_file.log")
 encrypt_pickled_data = " "
 key = " "
 
@@ -41,7 +41,7 @@ def save_dict(dict_data):
         True(log data): If the binary data is successfully stored in .bin file
         False(log data): If the non-binary data is stored in .bin file
     """
-    global text_path
+    global external_file_path
     global encrypt_pickled_data
     global key
     logging.info("Process is successfully started!!")
@@ -49,8 +49,8 @@ def save_dict(dict_data):
     pickle_dict_data = pickle.dumps(original_dict_data)
     key = gen_enc_key()
     encrypt_pickled_data = key.encrypt(pickle_dict_data)
-    text_path = os.path.join(text_path, "output.bin")
-    with open(text_path, "wb") as f:
+    external_file_path = os.path.join(external_file_path, "output.bin")
+    with open(external_file_path, "wb") as f:
         f.write(encrypt_pickled_data)
         logging.info("Encrypted data has been stored successfully!")
 
@@ -64,16 +64,16 @@ def read_data():
         False(log info):The data is not dict type plese check the log for more info!!
     """
     global encrypt_pickled_data
-    global text_path
+    global external_file_path
     global key
-    if os.path.exists(text_path):
+    if os.path.exists(external_file_path):
         logging.info(
             "Successfully verified the existence of the .bin file in the script path."
         )
     else:
         logging.error("The .bin file does not exist in the script path.")
         stop()
-    with open(text_path, "rb") as f:
+    with open(external_file_path, "rb") as f:
         read_encrypted_data = f.read()
         if encrypt_pickled_data == read_encrypted_data:
             logging.info(
