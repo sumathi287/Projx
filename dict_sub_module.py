@@ -66,25 +66,22 @@ def read_data():
     global encrypt_pickled_data
     global external_file_path
     global key
-    if os.path.exists(external_file_path):
-        logging.info(
-            "Successfully verified the existence of the .bin file in the script path."
-        )
-    else:
+    if not os.path.exists(external_file_path):
         logging.error("The .bin file does not exist in the script path.")
         stop()
+    # else:
+    #     logging.error("The .bin file does not exist in the script path.")
+    #     stop()
     with open(external_file_path, "rb") as f:
         read_encrypted_data = f.read()
         if encrypt_pickled_data == read_encrypted_data:
-            logging.info(
-                "The .bin file was read successfully, and encrypted data retrieved."
-            )
+            # logging.info("The .bin file was read successfully, and encrypted data retrieved.")
             decrypt_message = key.decrypt(read_encrypted_data)
             unpickled_decrypt_message = pickle.loads(decrypt_message)
             print("The received dict message is", unpickled_decrypt_message)
-            logging.info("The decrypted data was successfully unpickled")
+        # logging.info("The decrypted data was successfully unpickled")
         else:
-            logging.info(
+            logging.error(
                 "The read encrypt data is mismatch with original encrypted data"
             )
             stop()
