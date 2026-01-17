@@ -1,12 +1,32 @@
+##!CR: SUMMARY
+# - amazing job done from the previous version,
+# - the application now looks more professional and handles more test cases now
+##!CR: required improvements:
+##!CR:  USE Logger object instead of using it statically: read : https://stackoverflow.com/a/15735146
+##!CR:  test case: display windows error message if .ini file is missing
+##!CR:  import only the required methods/object from the modules
+
+# - only 3 "improvements" required to make you code professional -
+# the existing code is very functional - and of the intermediate industry standard!
+# WELL DONE!!!
+
+
 import ctypes
 from datetime import date, timedelta
-import os
+import os  ##!CR: note that very few methods/objects are used, import only the required ones.
+
+##!CR: for e.g.: if you are importing "dirname" from os.path
+##!CR: then say: from os.path import dirname
+##!CR: you can also give an alias like:
+##!CR: from os.path import dirname as os_path_dirname
 import pyautogui
 import sys
 from datetime import datetime
 
 # import time
-import logging
+import logging  ##!CR: Configure the logger such that data is logged in the log and also console screen
+
+##!CR: NOTE: create an object of the logging instead of using it with class [avoid static usage]
 import configparser
 import pytz
 
@@ -33,11 +53,13 @@ if not os.path.isfile(
     file_read_path
 ):  # check if the "config.ini" file path is existing or not in script location
     logging.error("Missing config.ini file. Application cannot continue.")
+    ##!CR: for missing ini file, please also raise a windows error message box
     sys.exit(1)
 file_read = config.read(
     file_read_path
 )  # file_read_path -> is path of "config.ini" file
-
+##!CR: please check if the ini file contains the required options:
+##!CR: i.e. what happens if age_of_image is not given in the .ini file
 level_str_age_of_image = config.get("logging", "age_of_image", fallback="-1")
 
 level_str_age_of_image = int(level_str_age_of_image)
@@ -55,6 +77,10 @@ level_str_image_type_to_delete = config.get(
 ).lower()
 log_level_str = config.get("logging", "level", fallback="DEBUG").upper()
 # get the value of an attribute of an object by name (as a string).
+
+##!CR: HERE: since we are using it statically, we are modifying it again using the basicConfig
+##!CR: if the logger is used with object, then it is easy to modify level
+
 log_level = getattr(logging, log_level_str, logging.DEBUG)
 # set up logging with specific configuration
 logging.basicConfig(
@@ -110,7 +136,7 @@ time_stamp = datetime.now(india_timezone)
 formating_str = time_stamp.strftime("%d-%m-%Y-%H_%M_%S")
 file_saved_path = os.path.join(
     file_dir, f"image_{formating_str}{level_str_image_extension_type}"
-)
+)  ##!CR: GREAT JOB HERE, using the f string
 logging.info(
     f"the saved image name :image_{formating_str}{level_str_image_extension_type}"
 )
